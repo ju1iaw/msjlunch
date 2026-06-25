@@ -114,72 +114,14 @@ export function hashPassword(password) {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
-// Seed a default admin account if none exists.
+// Seed the default admin account if none exists.
 const adminCount = db.prepare("SELECT COUNT(*) AS c FROM admins").get().c;
 if (adminCount === 0) {
   db.prepare("INSERT INTO admins (username, password_hash) VALUES (?, ?)").run(
-    "admin",
-    hashPassword("admin123")
+    "msjadmin",
+    hashPassword("lunchMSJ27")
   );
-  console.log("Seeded default admin -> username: admin, password: admin123");
-}
-
-// Seed some demo data the first time the DB is created so the app isn't empty.
-const itemCount = db.prepare("SELECT COUNT(*) AS c FROM items").get().c;
-if (itemCount === 0) {
-  const insertItem = db.prepare(
-    "INSERT INTO items (name, description, ingredients, allergens) VALUES (?, ?, ?, ?)"
-  );
-  const demoItems = [
-    ["Cheese Pizza", "Classic stone-baked cheese pizza.", "Flour, tomato, mozzarella, olive oil", "Wheat, Dairy"],
-    ["Teriyaki Chicken Bowl", "Grilled chicken over steamed rice.", "Chicken, rice, soy sauce, sesame", "Soy, Sesame"],
-    ["Garden Salad", "Fresh greens with house vinaigrette.", "Lettuce, tomato, cucumber, carrot", "None"],
-    ["Bean & Cheese Burrito", "Warm flour tortilla with beans and cheese.", "Tortilla, pinto beans, cheddar", "Wheat, Dairy"],
-    ["Spaghetti Marinara", "Pasta with classic marinara sauce.", "Pasta, tomato, garlic, basil", "Wheat"],
-    ["Fruit Cup", "Seasonal mixed fruit.", "Melon, grapes, pineapple", "None"],
-  ];
-  const ids = demoItems.map((it) => insertItem.run(...it).lastInsertRowid);
-
-  const insertMenu = db.prepare("INSERT INTO menus (date) VALUES (?)");
-  const insertMenuItem = db.prepare(
-    "INSERT INTO menu_items (menu_id, item_id) VALUES (?, ?)"
-  );
-  const today = new Date();
-  for (let d = 0; d < 5; d++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + d);
-    const iso = date.toISOString().slice(0, 10);
-    const menuId = insertMenu.run(iso).lastInsertRowid;
-    // rotate a few items per day
-    insertMenuItem.run(menuId, ids[d % ids.length]);
-    insertMenuItem.run(menuId, ids[(d + 1) % ids.length]);
-    insertMenuItem.run(menuId, ids[(d + 2) % ids.length]);
-  }
-
-  const insertPoll = db.prepare(
-    "INSERT INTO polls (question, deadline) VALUES (?, ?)"
-  );
-  const deadline = new Date(today);
-  deadline.setDate(today.getDate() + 7);
-  const pollId = insertPoll.run(
-    "Which new entrée should we add to the menu?",
-    deadline.toISOString().slice(0, 10)
-  ).lastInsertRowid;
-  const insertOption = db.prepare(
-    "INSERT INTO poll_options (poll_id, text) VALUES (?, ?)"
-  );
-  ["Korean BBQ Bowl", "Veggie Buddha Bowl", "Chicken Tikka Wrap", "Loaded Nachos"].forEach((o) =>
-    insertOption.run(pollId, o)
-  );
-
-  const insertValid = db.prepare(
-    "INSERT OR IGNORE INTO valid_students (student_id, school_year) VALUES (?, ?)"
-  );
-  ["1001", "1002", "1003", "1004", "1005"].forEach((s) =>
-    insertValid.run(s, "2025-2026")
-  );
-
-  console.log("Seeded demo items, menus, a poll, and sample student IDs (1001-1005).");
+  console.log("Seeded default admin -> username: msjadmin");
 }
 
 export default db;
