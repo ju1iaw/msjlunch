@@ -23,7 +23,7 @@ Open **http://localhost:5173** for the student site and **http://localhost:5173/
 
 ### Default logins / seed data
 
-- **Admin**: `admin` / `admin123`
+- **Admin**: `msjadmin` / `lunchMSJ27`
 - Seeded sample dishes, a week of menus, one poll, and valid student IDs `1001`–`1005`
   (use these to test poll voting).
 - **Students** log in passwordless with any email or phone number to save favorites &
